@@ -69,5 +69,21 @@ Source RPM: `~/rpmbuild/SRPMS/`
 5. Install Your RPM (Optional)
 
 ```bash
-sudo rpm -ivh ~/rpmbuild/RPMS/<arch>/saptune-3.1-5.<arch>.rpm
+sudo rpm -ivh ~/rpmbuild/RPMS/<arch>/saptune-3.1.5-0.<arch>.rpm
+```
+
+Using `alien`:
+
+```bash
+sudo apt install alien
+sudo alien -i saptune-3.1.5-0.x86_64.rpm
+```
+
+6. Run `saptune`
+
+```bash
+sudo saptune configure reset
+sudo saptune service enablestart
+sudo saptune solution apply NETWEAVER+HANA
+sudo saptune solution verify
 ```
