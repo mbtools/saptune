@@ -1,0 +1,867 @@
+-------------------------------------------------------------------
+Thu Apr  3 12:38:01 UTC 2025 - abriel@suse.com
+
+- build with -buildmode=pie
+  (bsc#1239942)
+
+-------------------------------------------------------------------
+Tue Feb  5 18:31:36 UTC 2025 - abriel@suse.com
+
+- update package version of saptune to 3.1.5
+  * on Azure cloud create a saptune service drop-in file to start
+    saptune after cloud-final.service
+    (bsc#1235824, jsc#SAPSOL-523)
+  * fix NVMe device detection and update man page saptune-note.5
+    (bsc#1233126)
+  * fix wrong error handling, if system limits.conf file is missing
+    and skip reading system limits.conf file on SLES 16 as it can
+    not contain customer changes
+    (bsc#1236232)
+  * fix value for grub transparent_hugepage entries in Note 2684254
+    (bsc#1235579)
+
+-------------------------------------------------------------------
+Fri Nov 29 14:46:37 UTC 2024 - abriel@suse.com
+
+- update package version of saptune to 3.1.4
+  * update man page 'saptune.8'.
+    add warning about race condition of systemd units during system
+    boot.
+    (bsc#1190508)
+  * for all note definition files we changed the link location for
+    the related SAP Notes from 'launchpad.support.sap.com' to the
+    new 'me.sap.com' location.
+    (bsc#1232212)
+  * SAP Note 1656250 updated to Version 69
+    SAP Note 1805750 updated to Version 10
+    SAP Note 2993054 updated to Version 3
+    but without parameter value changes, only house keeping of the
+    version section
+    (bsc#1232212)
+  * SAP Note 1680803 updated to Version 28
+    SAP Note 2382421 updated to Version 47
+    SAP Note 2578899 updated to Version 50
+    SAP Note 2684254 updated to Version 24
+    SAP Note 3024346 updated to Version 12
+    (bsc#1232212)
+  * With SAP Note 2684254 updated to Version 24 the setting of
+    transparent hugepages (THP) will change from 'never' to
+    'madvise' for systems running 15SP5 and higher.
+
+-------------------------------------------------------------------
+Fri Jun 28 13:36:47 UTC 2024 - abriel@suse.com
+
+- update package version of saptune to 3.1.3
+  * remove note 1868829 from solution S4HANA-APPSERVER as it is a
+    HANA DB note and was added by accident
+    (bsc#1226093)
+  * for verify and simulate output table - wrap content of the
+    columns 'actual', 'expected' and 'override', if they exceed a
+    width of 30 characters (e.g. net.ipv4.ip_local_reserved_ports)
+  * support inline comments in /etc/sysconfig/saptune
+  * change handling of the performance options.
+    Check, if the settings are supported in the get-Functions too.
+    This should fix the problem with some special Azure VMs
+    (E20d_v5) on newer SLES SPs
+    (jsc#SAPSOL-110)
+  * SAP Note 2578899 updated to Version 48
+    setting kernel.pid_max to 4194304 and
+    start sysctl-logger service
+
+-------------------------------------------------------------------
+Tue Apr  9 13:32:06 UTC 2024 - abriel@suse.com
+
+- add require of package sysctl-logger for 15SP4 and 15SP5 too
+  (jsc#PED-6220)
+
+-------------------------------------------------------------------
+Wed Feb 14 08:10:58 UTC 2024 - abriel@suse.com
+
+- update package version of saptune to 3.1.2
+  * to support setups with saptune monitoring and heavy automation
+    we limited the setting of our saptune lock to commands having
+    the potential to change anything in the system.
+    (bsc#1219500)
+  * fix timestamp in log messages of saptune
+  * remove redundant version information in header comment of
+    note definition files
+  * SAP Note 1656250 updated to Version 63
+    SAP Note 1771258 updated to Version 8
+    SAP Note 2382421 updated to Version 45
+    SAP Note 3024346 updated to Version 10
+    but without parameter value changes, only house keeping of the
+    version section and comment updates
+  * SAP Note 1984787 updated to Version 42
+    SAP Note 2578899 updated to Version 47
+
+- add require of package sysctl-logger for 15SP6
+  (jsc#PED-5025)
+
+-------------------------------------------------------------------
+Wed Nov  1 17:21:25 UTC 2023 - abriel@suse.com
+
+- update package version of saptune to 3.1.1
+  * typo in logfile directory name creates /varlog/saptune instead
+    of /var/log/saptune
+    (bsc#1215969)
+  * SAP Note 2382421
+    fix missing handling for Azure systems regarding parameter
+    'net.ipv4.tcp_timestamps'. This exclude setting was left out
+    during the last SAP Note update by mistake.
+  * add parameter IGNORE_RELOAD to /etc/sysconfig/saptune to
+    prevent saptune from stopping and starting the system tuning
+    during package update
+    Related to sapconf bug bsc#1209408.
+
+- create a flag file in preinstall and remove it in posttrans of
+  the package installation to inform saptune that currently a
+  package installation/update takes place so that some special
+  situations can be handled as expected.
+
+-------------------------------------------------------------------
+Wed Aug 30 15:24:11 UTC 2023 - abriel@suse.com
+
+- update package version of saptune to 3.1.0
+  * machine readable interfaces for saptune
+    add json output support
+    related json v1 schemas can be found after installation 
+    on the system at /usr/share/saptune/schemas/1.0/
+    (jsc#PED-2194, jsc#PED-2195, jsc#SLE-23696)
+  * enhance the identification of the cloud service provider
+    (jsc#SLE-23779)
+  * add a command line syntax check
+  * colorized and filtered output for 'saptune note verify'
+    It is now possible to uses a 'color scheme' for the output to
+    highlight the non-compliant parameter or to limit the verify
+    output to show only non-compliant parameter.
+    (jsc#SLE-23727)
+  * add action 'saptune solution change' to switch to a new
+    solution even that another solution was already applied.
+    It's basically a 'revert OLDSOLUTION' && 'apply NEWSOLUTION'.
+    This will change the Note order in case of additional applied
+    Notes, but this is intended.
+    The confirmation for the revert of the old solution can be
+    suppressed by '--force'
+    (jsc#PED-2196)
+  * introduce a Trento naming convention for custom solutions in
+    the saptune man page to support trento checks.
+    (jsc#PED-4118)
+  * deprecate action 'saptune note|solution simulate'.
+    The action might get removed in a future saptune version
+    (jsc#PED-2199)
+  * deprecate support for the v1 vendor or custom specific Note
+    definition file format
+    (jsc#SLE-23725)
+  * detect virtualization environment by 'systemd-detect-virt' and
+    add the information to 'saptune status'.
+    (jsc#SLE-23885)
+  * enhance saptune with the new action 'check' to directly call
+    the external check script '/usr/sbin/saptune_check'.
+    (jsc#SLE-23726)
+  * de-deprecate the MAXDB solution definition. It is still active
+    supported by SAP.
+    And add solution NETWEAVER+MAXDB
+    (jsc#SLE-23724)
+  * support inline comments in the Note definition files
+    (jsc#SLE-23729)
+  * rework Note representation in 'saptune status' output
+    (jsc#SLE-24530)
+  * fix problem with 'verify' output, if a sysctl parameter is
+    empty on the system
+    (bsc#1199527)
+  * add hint to the manual page of saptune(8) regarding 'missing'
+    line feed for 'saptune note applied' and 'saptune note enabled'
+    It's intended.
+    (bsc#1193714)
+  * rework the version section to make it clear, which information
+    needs to be provided
+    (jsc#SLE-23722)
+  * add more information to 'saptune status':
+    differ between 'enabled' and 'applied' Solutions and add the
+    related Notes.
+    differ between Notes and Solutions in the staging area.
+    rename 'system state' line to 'systemd system state' to prevent
+    misunderstandings.
+    add virtualisation information.
+  * add tuning state to 'saptune status' output.
+    The check of the tuning state (an internal 'verify' operation)
+    can be skipped by using the flag '--non-compliance-check'.
+    In this case the tuning state will be reported as
+       unknown (checking disabled)
+    'saptune status' will exit with a return code of '4', if the
+    saptune service is enabled, the system is tuned, but the
+    tuning state is 'not compliant'.
+    (jsc#SLE-24928)
+  * add support for the IBM Power architecture to the vendor and
+    model section tagging
+    (jsc#SLE-23824)
+  * add new SAP Note 1868829 to set fs.aio-max-nr and add it to
+    the HANADB related solutions for SLE12 and SLE15.
+  * SAP Note 3024346 updated to Version 6
+    SAP Note 1557506 updated to Version 16
+    SAP Note 1656250 updated to Version 46
+    SAP Note 1805750 updated to Version 9
+    SAP Note 2161991 updated to Version 28
+    SAP Note 2205917 updated to Version 63
+    SAP Note 2382421 updated to Version 45
+    SAP Note 2534844 updated to Version 15
+    SAP Note BOBJ updated to Version 1
+    but without parameter value changes, only house keeping of the
+    version section and comment updates
+  * SAP Note 1984787 updated to Version 40
+    SAP Note 2578899 updated to Version 46
+    SAP Note 2684254 updated to Version 23
+    SAP Note 1680803 updated to Version 27
+    includes version 3.1 of 'SAP Applications on SAP Adaptive
+    Server Enterprise - Best Practices for Migration and Runtime'
+  * Solution 'SAP-ASE' changed - remove SAP Note 1410736.
+    The best practice document (version 3.1) for ASE was changed
+    and the SAP Note 1410736 is no longer referenced. Instead the
+    parameter 'net.ipv4.tcp_keepalive_time' is set in
+    SAP Note 1680803 (the ASE SAP Note) directly.
+  * introduce an additional parameter 'SKIP_SYSCTL_FILES' in the
+    /etc/sysconfig/saptune configuration file, which contains a
+    comma separated list of sysctl.conf files or directories
+    containing sysctl.conf files, which should be excluded from
+    the 'additional defined' WARNING messages.
+    Default is
+        SKIP_SYSCTL_FILES="/boot"
+    to skip the WARNINGS for '/boot/sysctl.conf-<kernelversion>'
+
+- check in preinstall and posttrans of the package installation,
+  if the active tuned profile is still 'saptune', even that this
+  profile no longer exists. If yes, try to remove it.
+  (bsc#1194688)
+
+-------------------------------------------------------------------
+Mon Jan 10 14:04:03 UTC 2022 - abriel@suse.com
+
+- update package version of saptune to 3.0.2
+- avoid excluding LVM slaves when getting valid block devices
+  (bsc#1194299)
+- fix 'not compliant' state for energy_perf_bias on Power systems
+  and suppress misleading error message regarding missing 'mokutil'
+  (bsc#1193435)
+- fix wrong behaviour of 'saptune revert all', if the saptune
+  service was stopped between the two commands 'apply' and
+  'revert all'
+- 'saptune service enablestart|disablestop' now always perform
+  both actions and does no longer stop working, if the service is
+  already started|stopped.
+  (bsc#1193241)
+- restrict the sys section of the AWS note 1656250 to the
+  availability of a nvme block device to support AWS x1e instances
+  too.
+  sys section definition of Note 1656250 changed.
+  (bsc#1192029)
+- abandon the dependency to 'mokutil' by relying on sysfs to
+  detect a secure boot environment.
+  Related to bsc#1193435
+- support /etc/fstab entries with 4 instead of 6 fields as these
+  are valid entries.
+  Change error handling from 'panic' to error log messages.
+  (bsc#1193580)
+- enhance man page 'saptune.8'.
+  Add entry 'configured Note' and some more descriptions of the
+  entries from 'saptune service status'
+  (bsc#1192697)
+- as the Power systems (hardware architecture 'ppc64le') does not
+  support files in '/sys/class/dmi' (this directory is not
+  available on the 'ppc64le' hardware architecture) some of our
+  section 'tags' will not work.
+  Add some additional log messages to identify the cause and add
+  a hint to the man page.
+- fix block device settings (e.g. NRREQ) for multipath devices
+  (bsc#1193576)
+- 'saptune verify' will now report a non existing sysctl or sys
+  parameter as 'not available on the system' (footnote) and this
+  parameter will not affect the compliance state.
+  But a warning is displayed to raise attention to may be typos in
+  the parameter name.
+- 'saptune status' now reports the 'real' unit state, no mapping
+  of not running (inactive) service to simply 'stopped' any more.
+  (bsc#1194334)
+
+-------------------------------------------------------------------
+Tue Nov  9 19:06:09 UTC 2021 - abriel@suse.com
+
+- update package version of saptune to 3.0.1
+- fix the scheduler settings for multi path devices and
+  suppress missleading warning messages regarding vendor and model
+  information during block device detection
+  (bsc#1192460)
+- fix override of custom solutions
+  (bsc#1192062)
+- add missing update function for enabled solutions and add a
+  special fix to correct the 3.0.0 behavior
+  (bsc#1192053)
+- saptune_check - degraded system is no longer considered an error
+  (bsc#1192272)
+- log missing model and vendor information to the saptune log file
+  (bsc#1190509)
+
+-------------------------------------------------------------------
+Mon Sep 13 13:03:36 UTC 2021 - abriel@suse.com
+
+- update package version of saptune to 3.0.0
+  This will be additional reflected in the saptune version found in
+  /etc/sysconfig/saptune (SAPTUNE_VERSION)
+  So now we will have saptune version 3
+  
+- saptune version 3
+  Strengthen configuration process with staging, checks of external
+  changes and expansion of automation to new platforms (Azure, AWS)
+  and hardware specifics
+  (jsc#SLE-21029 and jsc#SLE-20985)
+
+- remove saptune version 1
+  (jsc#SLE-10823 and jsc#SLE-10842)
+- remove usage of tuned from saptune
+  Add an own systemd service file for saptune to start/stop tuning
+  of parameter values during a reboot of the system.
+  Add a new saptune action 'service' to handle the saptune.service
+  supporting start/stop/enable/disable/status a.s.m.
+  The saptune action 'daemon', which handled tuned.service in the
+  past, is now flagged as 'deprecated' and internally linked to the
+  new action 'service'
+  (jsc#SLE-5589, jsc#SLE-5588, jsc#SLE-6457)
+- add a sanity check to detect Note definition files which do not
+  exist anymore, because they were renamed or deleted, but without
+  reverting them before.
+  saptune will now print an error message, remove the Note from the
+  tracking variables in /etc/sysconfig/saptune and try to revert
+  the related parameter settings.
+  (bsc#1149205)
+- check, if json input file is empty and handle some left-over
+  files from the migration from saptune v1 to saptune v2
+  (bsc#1167618)
+- To support system parameters only relevant for specific SLES
+  releases, service packs and/or hardware architectures saptune
+  now supports 'tagged' sections inside the Note definition files.
+  (jsc#SLE-13246, jsc#SLE-13245)
+- new kernel requirement for Power added to SAP-Note 2205917 and
+  2684254
+  SAP Note 2205917 updated to Version 61
+  SAP Note 2684254 updated to Version 15
+  (bsc#1167416)
+- SAP Note 2382421 updated to Version 37
+  and move all 'not-well-defined' parameters from the 'reminder'
+  section into the 'sysctl' section, but with 'empty' values.
+  Use an override file to define the values fitting your system
+  requirements
+  (bsc#1170672)
+- support empty parameter values in the Note definition files and
+  not only in the override file.
+  This is needed for the support of SAP Notes like 2382421, so that
+  the customer is able to simply use an override file to define
+  some special parameters instead of using a customer specific Note
+  definition file.
+  needed for bsc#1170672
+  (jsc#TEAM-1702)
+- report an 'error' instead of 'info' and set the exit code to '1',
+  if we reject the apply of a solution
+  (bsc#1167213)
+- Skip perf bias change if secure boot is enabled
+  When a system is in lockdown mode, i.e., Secure Boot is enabled,
+  MSR cannot be altered in user-space. So check, if Secure Boot is
+  enabled using the mokutil utility and skip setting the perf bias
+  in case it is.
+  (bsc#1176243)
+- rework the internal block device handling to speed up the apply
+  of block device related tunings on systems with a high number of
+  block devices.
+  (bsc#1178207)
+- change block device handling to handle multipath devices
+  correctly. Only the DM multipath devices will be used for the
+  settings, but not its paths.
+  (bsc#1179275)
+- fixed wrong comparison used for setting FORCE_LATENCY
+  (bsc#1185702)
+- add keyword 'all' to the 'rpm' section description in the man page
+  saptune-note(5)
+  (bsc#1182287)
+- support note definition versions containing digits, upper-case
+  and lower-case letters, dots, underscores, minus and plus signs.
+  (bsc#1182289)
+- fixed issue with 'verify' operation and parameter
+  'VSZ_TMPFS_PERCENT'. As this parameter is only used to calculate
+  the value of 'ShmFileSystemSizeMB' (if it is not set to a value
+  >0 in the Note definition file) it will not be checked and
+  compared during the saptune operation 'verify'. A footnote is
+  pointing this out.
+  (bsc#1182009)
+- SAP Note 1771258 update nofile values
+  (bsc#1164720)
+- SAP Note 2684254 updated to Version 20
+  SAP Note 2578899 updated to Version 39
+  SAP Note 1680803 updated to Version 26
+
+- enhancements for saptune version 3
+  All jsc#TEAM-* entries mentioned below are related to this rework
+  (jsc#SLE-16972)
+
+- Implement a lock to avoid multiple instances of saptune running
+  in parallel.
+  (jsc#TEAM-1700)
+- Support for non-colorized output
+  If redirecting the output from saptune to a pipe, you no longer
+  need to deal with the 'ugly' control sequences for the colorized
+  output.
+  (jsc#TEAM-1679)
+- Add enable/disable for systemd units and support all systemd unit
+  types in section [service]
+  (jsc#TEAM-1701)
+- remove script /usr/share/doc/packages/saptune/sapconf2saptune
+  and the associated man page
+  (jsc#TEAM-1707)
+- implement staging of Note definition file and solution
+  definitions.
+  The idea is to freeze the saptune configuration to avoid config
+  changes on package update when adding/removing/changing notes
+  or solutions within the package
+  (jsc#TEAM-1844)
+- support custom solutions and override files for solutions.
+  Partners and customers will now be able to define their own
+  solution definitions by using files in /etc/saptune/extra
+  or to override the shipped solution definitions by using
+  override files in /etc/saptune/override
+  (jsc#TEAM-1706)
+- support for device specific configurations 
+  only supported for the [block] section, tags are 'vendor' and
+  'model' to support special block devices of a dedicated hardware
+  vendor or a dedicated hardware model
+  (jsc#TEAM-1728)
+- add support for AZURE cloud (SAP Note 2993054)
+  (jsc#TEAM-2676)
+- add support for AWS cloud (SAP Note 1656250)
+  (jsc#TEAM-1754 and jsc#TEAM-1755)
+- add NVMe support to the block device handling to support AWS
+  (jsc#TEAM-2675)
+- add SAP Note 3024346 (a NetApp note)
+  (jsc#TEAM-3454)
+- rework daemon and service actions
+  (jsc#TEAM-3154)
+- add support for 'read_ahead_kb' and 'max_sectors_kb' to the
+  [block] section
+  (jsc#TEAM-1699)
+- add a warning to the reminder section of SAP Note 2382421
+  regarding iSCSI devices and setting of 'net.ipv4.tcp_syn_retries'
+  (jsc#TEAM-1705)
+- for the actions 'note customise' and 'note create' check, if the
+  customer has changed something during the editor session.
+  If not, remove the temporary created note definition file.
+  (jsc#TEAM-825)
+- add support for [sys] section
+  and handle double configurations for parameters defined in the 
+  [sys] section
+  (jsc#TEAM-3342)
+- check system sysctl config files as mentioned in the comments of
+  /etc/sysctl.conf and in man page sysctl.conf(5) for sysctl
+  parameters currently set by saptune notes. Print a warning and a
+  footnote for 'verify' and 'customize'.
+  (jsc#TEAM-1696)
+- add support for [filesystem] section
+  only check filesystem mount options, not modify. Starting with
+  filesystem type 'xfs'
+  (jsc#TEAM-4093)
+- add SAP Note 900929 for SAP Netweaver workloads.
+  It's the equivalent to the HANA Note 1980196.
+  (jsc#TEAM-4386)
+- mv state files from /var/lib/saptune to /run/saptune to solve
+  the problem of state files surviving a reboot.
+- add /sbin/saptune_check
+- add the description of the solution definitions shipped with
+  saptune to the man page saptune(8)
+  (jsc#TEAM-4260)
+
+-------------------------------------------------------------------
+Mon Feb 25 16:59:15 UTC 2020 - abriel@suse.com
+
+- update version of saptune v2 to 2.0.3
+- changes to the UserTasksMax handling in saptune
+  In SLE15 the limit is removed from the systemd login manager and
+  therefore the setting is no longer supported in SLE15 by saptune.
+
+  On a system running SLE12 we do not restart the logind service,
+  but try to reload the new configuration after creating or
+  removing the drop-in file for UserTasksMax by using
+  'systemctl reload-or-try-restart systemd-logind'
+  as display managers do not like a restart of the logind service.
+  (bsc#1161791)
+- add commands for listing enabled Notes/Solutions to saptune
+  (bsc#1160564)
+- correct typo in the year in the man page headline of man page
+  saptune-note(5)
+- SAP Note 1410736 updated to Version 6
+  correct typo net.ipv4.tcp_probes to net.ipv4.tcp_keepalive_probes
+
+-------------------------------------------------------------------
+Tue Jan 14 14:57:59 UTC 2020 - abriel@suse.com
+
+- if a parameter is not supported by the system, the note action
+  'verify' will no longer report this as an error even if the value
+  is not compliant.
+  Additionally if there is a non compliant 'grub' parameter, which
+  has a compliant 'alternative' setting availabel (see man page 
+  saptune-note(5) for details), the note action 'verify' will no
+  longer report this as an error
+  (bsc#1159671)
+
+-------------------------------------------------------------------
+Thu Jan  2 12:33:00 UTC 2020 - abriel@suse.com
+
+- remove no longer needed and now misleading message at the end of
+  note action 'revert'.
+- check, if sapconf service is available before disabling this
+  service during 'saptune daemon start'
+  (bsc#1156049)
+
+-------------------------------------------------------------------
+Tue Dec  3 09:37:55 UTC 2019 - abriel@suse.com
+
+- add action 'delete' to the 'note' operation to delete a customer
+  or vendor specific Note definition file including the
+  corresponding override file if available.
+  A confirmation is needed to finish the action.
+
+  add action 'rename' to the 'note' operation to rename a customer
+  or vendor specific Note definition file to a new name. If a
+  corresponding override file is available, this file will be
+  renamed too. A confirmation is needed to finish the action.
+
+  If the Note is already applied, the action will be terminated
+  with the information, that the Note first needs to be reverted
+  before it can be deleted or renamed.
+  (jsc#SLE-9283)
+
+-------------------------------------------------------------------
+Fri Nov  8 17:03:01 UTC 2019 - abriel@suse.com
+
+- Inform the customer that - by intention - the command 
+         'saptune note customise <NoteID>'
+  does not apply changes immediately. It just changes the
+  configuration in the 'override' file. These changes have to be
+  applied in a second step.
+  This is explained in the man page saptune_v2(8) and a message is
+  printed in the logs and on the screen to inform the customer.
+  (bsc#1142467)
+
+-------------------------------------------------------------------
+Thu Nov  7 09:59:54 UTC 2019 - abriel@suse.com
+
+- Add warning to man page, not to rename/remove/modify active
+  configurations
+  (bsc#1149002)
+
+-------------------------------------------------------------------
+Mon Oct 28 12:27:21 UTC 2019 - abriel@suse.com
+
+- update version of saptune v2 to 2.0.2
+- support multi-queue I/O scheduler for block devices
+  (bsc#1152598)
+
+-------------------------------------------------------------------
+Fri Oct  4 11:24:11 UTC 2019 - abriel@suse.com
+
+- check, if the directory /etc/security/limits.d exists before
+  writing the limits drop-in file. If not, create it.
+
+- add the '--no-pager' option to 'systemctl --list-unit-files' to
+  get all services at once.
+
+- add missing search pattern to the update helper script to find all
+  old and superfluous notes during upgrade from SLE12 to SLE15
+
+  For the daemon operations do not exit with an error, if a note
+  definition file does not exist. Instead only log and print an
+  error message, but continue with applying the other notes
+  (bsc#1142526)
+
+-------------------------------------------------------------------
+Fri Jul 19 08:49:08 UTC 2019 - abriel@suse.com
+
+- on 12SP1 and 12SP2 the directory /etc/security/limits.d may not
+  exist. So create the missing directory during postinstall of the
+  package.
+
+-------------------------------------------------------------------
+Mon Jun 17 10:15:05 UTC 2019 - Angela Briel <abriel@suse.com>
+
+- update version of saptune v2 to 2.0.1
+- update version of saptune v1 to 1.1.9 for migration purposes
+- resetting all values to clean the system during package removal
+
+- bugfixing saptune version 1:
+  fix saptune issues with /etc/security/limits.conf (bsc#1124485)
+  add deprecated message to the description of some notes
+  set scheduler for note SUSE-GUIDE-01 correctly (bsc#1123808)
+
+  No additional improvements or upgrades planned for saptune v1
+  For new features or current SAP Note settings please migrate to
+  saptune v2.
+
+- support migration from saptune v1 to saptune v2
+  ship both versions of saptune in one package to support a
+  smooth migration controlled by the customer.
+  see man saptune-migrate(5) for more information
+- support note name changes and note deletion during update of
+  saptune v2 from SLE12 to SLE15
+- support different SAP Note definitions and solution definitions
+  related to the used operation system version
+  (distinguish between SLE12 and SLE15 at the moment)
+
+- Remove calculation of optimized values, only set the values from
+  the configuration file irrespective of the current system value.
+  Current system value can be increase or decrease.
+  ATTENTION: saptune no longer respects higher system values.
+  Use the override option to change the values of the Note
+  definition files, if needed
+  (bsc#1124488)
+
+- mark the Notes SUSE-GUIDE-01 and SUSE-GUIDE-02 as deprecated in
+  saptune v1 and remove these Note definitions from saptune v2
+  (bsc#1116799)
+- add support helper script sapconf2saptune and the man page
+- add new man pages saptune_v1.8, saptune_v2.8, saptune-note.5
+  and saptune-migrate.7
+  rewrite man page saptune.8
+- add bash-completion for saptune
+- add action 'show' to the 'note' operation to print content of
+  the note definition file to stdout
+- add new action 'create' to support the customer/vendor while
+  creating a vendor or customer specific file in /etc/saptune/extra
+  using the template file /usr/share/saptune/NoteTemplate.conf
+- simplify file name syntax for the vendor files available in
+  /etc/saptune/extra. Old file names still valid and supported.
+  Add header support (version, date, description) for the vendor
+  files available in /etc/saptune/extra as already available for
+  the note definition files in /usr/share/saptune/notes
+- no longer write or remove entries from /etc/security/limits.conf.
+  Instead add or remove drop-in files in /etc/security/limits.d
+  The filename syntax for the drop-in files /etc/security/limits.d
+  is saptune-<domain>-<item>-<type>.conf
+  The limits entry syntax inside the Note definition files changed
+  to support more than one limits settings in the definition file
+  (bsc#1128322)
+- preserve comment sections of the security limits file
+  /etc/security/limits.conf. Especially, if this is the only
+  content of the file.
+  (bsc#1124485)
+- work with the current Note definition file to define the pagecache
+  settings and not with the default file
+  rename PAGECACHE_LIMIT_IGNORE_DIRTY to the correct sysctl name
+  vm.pagecache_limit_ignore_dirty
+  (bsc#1126220)
+- setting of UserTaskMax is not done in the postinstall of the
+  package. It's now done by applying the related SAP Notes.
+  (bsc#1124489)
+- starting to support severities INFO, WARNING, ERROR and DEBUG
+  for the logging and add a defined format for the log messages
+- remove saptune as active tuned profile during action
+  'saptune daemon stop'
+- start/stop services, if requested by SAP Notes, but do not
+  enable/disable these services
+  (bsc#1128325)
+- adapt the parameter oriented save state file handling (store and
+  revert) to the special needs of the security limits parameter
+  (bsc#1124485)
+- disable parameter settings using an override file (bsc#1124486)
+- store the order of the note as they are applied to get the same
+  system tuning result after a system reboot as before
+- correct the revert of the vm.dirty parameters by handling their
+  counterpart parameters in addition.
+  (bsc#1124487)
+- adjust operation customize to the new configuration files and
+  override location and enable customize option for vendor and
+  customer specific files in /etc/saptune/extra
+  (bsc#1124487)
+- Change output format of the operations list, verify and simulate
+  (bsc#1124487)
+- Display footnotes during 'verify' and 'simulate'
+  (bsc#1124487)
+- print current applied note order at the end of 'saptune note list'
+  and 'saptune note verify'
+- remove Netweaver formula for page cache calculation. Use the
+  HANA approach '2% system memory' for both
+- display a warning message, if a [block] section is found in the
+  Note definition file because on systems with a huge number of
+  block devices this operation may take some time
+- Add force_latency handling to 'cpu' section.
+  Use the files in /sys/devices/system/cpu/cpu* instead of
+  /dev/cpu_dma_latency.
+  Remove the parameter from the tuned.conf file and add it to
+  the SAP note files '1984787' and '2205917'
+- Add action 'saptune revert all' and add parameter based saved
+  state files to support proper revert functionality
+  (bsc#1124487)
+- Add override file handling for the solution definition using
+  /etc/saptune/override/solution (bsc#1124486)
+- Read solution definition from file /usr/share/saptune/solution
+  instead of static coding inside of saptune.
+  (bsc#1124486)
+- tag deprecated solutions during list operation
+- allow only ONE solution to be applied
+- new solution definitions as discussed with SAP and Alliance team
+- support solution names with '+'
+- make sure a note, which is part of an applied solution definition,
+  but was reverted manually later, will NOT applied again after a
+  system reboot.
+- One configuration file per SAP Note (bsc#1124486)
+- add new SAP Notes and adapt content of SAP Notes
+- Handle different locations of the new configuration files
+  (/usr/share/saptune/note, /etc/saptune/extra)
+  (bsc#1124486)
+- Allow parameter override by the customer (bsc#1124486)
+- Expand section handling of the 'ini file' handler to handle the
+  new configuration file entries. Supported sections:
+  version, reminder, login, mem, vm, block, limits, sysctl,
+  pagecache, cpu, service, rpm, grub
+  (bsc#1124486)
+
+-------------------------------------------------------------------
+Thu Jan  3 14:09:01 UTC 2019 - abriel@suse.com
+
+- remove new line from println arg list of main.go to support newer
+  go versions.
+  (bsc#1120741)
+- update version to 1.1.8
+
+-------------------------------------------------------------------
+Thu Oct 25 08:33:28 UTC 2018 - abriel@suse.com
+
+- never ever stop or disable uuidd.socket in saptune (bsc#1100107)
+- update version to 1.1.7
+
+-------------------------------------------------------------------
+Thu Apr 26 13:32:53 UTC 2018 - abriel@suse.com
+
+- correct content of /etc/systemd/logind.conf.d/sap.conf.
+  (bsc#1089864)
+
+- improve error messages and exclude special block devices
+  from 'number of request' settings. Improve the verify option for
+  the block devices.
+  (bsc#1079599)
+
+-------------------------------------------------------------------
+Thu Feb  8 09:32:45 UTC 2018 - gboiko@suse.com
+ 
+- Fix a typo in package description. (bsc#1053374)
+- Update from version 1.1.3 to 1.1.4
+
+-------------------------------------------------------------------
+Fri Dec 15 10:30:39 UTC 2017 - abriel@suse.com
+
+- Start to support multiqueue schedulers.
+  Writing a message to the log file, if a block device does not
+  support the choosen scheduler.
+  (bsc#1072562)
+
+-------------------------------------------------------------------
+Wed Dec 13 08:53:33 UTC 2017 - abriel@suse.com
+
+- Check, if pagecache limit is available at the system. If yes, add
+  SAP note 1557506 to the note list and the solution definition of
+  saptune. If not, skip SAP note 1557506 silently
+  (bsc#1071539, fate#323778)
+
+-------------------------------------------------------------------
+Mon Dec 11 15:40:25 UTC 2017 - abriel@suse.com
+
+- Skip using tuned-adm command inside of saptune. Instead write 
+  'saptune' profile directly to /etc/tuned/active_profile and
+  enable and start the tuned service
+  Remove the workaround for the tuned problem with section [cpu]
+  (bsc#1060514)
+
+-------------------------------------------------------------------
+Fri Nov 10 13:32:05 UTC 2017 - abriel@suse.com
+
+- workaround for a tuned problem with section [cpu]
+  (bsc#1060514)
+
+-------------------------------------------------------------------
+Wed Oct 25 14:44:39 UTC 2017 - abriel@suse.com
+
+- support customer entries in /etc/security/limits.conf containing 
+  values like 'unlimited' instead of an integer value.
+  (bsc#1060469)
+- change error handling and redirect error messages to stderr instead
+  of stdout. (bsc#1050521)
+
+-------------------------------------------------------------------
+Fri Aug 11 08:48:41 UTC 2017 - hguo@suse.com
+
+- Fix a typo in package description.
+  (bsc#1053374)
+
+-------------------------------------------------------------------
+Tue Jun 27 12:12:32 UTC 2017 - abriel@suse.com
+
+- Amend logind's behaviour
+  (bsc#1031355, bsc#1039309, bsc#1043844)
+
+-------------------------------------------------------------------
+Fri May 12 08:28:43 UTC 2017 - abriel@suse.com
+
+- update man page to reflect the changes for bsc#1026172
+
+-------------------------------------------------------------------
+Thu Apr 27 15:51:02 UTC 2017 - abriel@suse.com
+
+- add solution SAP ASE (Sybase) and SAP Business OBJects (BOBJ)
+  according to fate#320359.
+
+-------------------------------------------------------------------
+Fri Mar 24 13:32:38 UTC 2017 - abriel@suse.com
+
+- Support of vendor specific tune files located in /etc/saptune/extra
+  (bsc#1026172).
+
+-------------------------------------------------------------------
+Mon Nov 14 13:12:21 UTC 2016 - hguo@suse.com
+
+- Tune a PowerPC little endian system in a way similar to x86 system.
+  Bump version to 1.0.5 to fix (bsc#1009529).
+
+-------------------------------------------------------------------
+Fri Oct 21 12:58:32 UTC 2016 - hguo@suse.com
+
+- Fix processing of CLI parameter "--help" (bsc#1006114).
+- Fix startup failure caused by absence of sapconf package (bsc#1006187).
+
+-------------------------------------------------------------------
+Tue Aug  2 12:51:35 UTC 2016 - hguo@suse.com
+
+- Avoid conflicting with sysconfig path of sapconf. (bsc#988186)
+  Bump versin to 1.0.3.
+
+-------------------------------------------------------------------
+Fri Jul  8 11:50:27 UTC 2016 - hguo@suse.com
+
+- Remove conflict against sapconf to resolve
+  bsc#988186.
+  Bump version to 1.0.2.
+
+-------------------------------------------------------------------
+Mon Jul  4 08:58:42 UTC 2016 - hguo@suse.com
+
+- Exclusively build on X86_64 and PPC64le.
+  Continue with fate#320360, fate#320361, fate#320362, fate#320633.
+
+-------------------------------------------------------------------
+Fri Jun  3 09:26:13 UTC 2016 - hguo@suse.com
+
+- Remove ExclusiveArch.
+- Control uuidd as part of the tuning process.
+- Minor changes in the wording of CLI program output.
+- saptune conflicts with sapconf.
+- Bump version to 1.0.1.
+- fate#320360, fate#320361, fate#320362, fate#320633.
+
+-------------------------------------------------------------------
+Thu Apr 28 09:32:50 UTC 2016 - hguo@suse.com
+
+- First revision.
+  Implement fate#320360, fate#320361, fate#320362, fate#320633.
+

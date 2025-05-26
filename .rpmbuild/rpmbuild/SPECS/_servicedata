@@ -1,0 +1,4 @@
+<servicedata>
+<service name="tar_scm">
+          <param name="url">git://github.com/SUSE/saptune.git</param>
+          <param name="changesrevision">260dd8d872769923febe6658d462ca8fb11d1209</param></service></servicedata>
